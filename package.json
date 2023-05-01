@@ -1,0 +1,21 @@
+{
+  "name": "firefox-addons-only-template",
+  "version": "0.0.1.2",
+  "description": "",
+  "scripts": {
+    "git_push": "git add . && git commit -m '0.0.1.2' && git push --force ",
+    "webpack": "webpack"
+  },
+  "homepage": "https://github.com/VacantThinker/firefox-addons-only-template",
+  "author": "vacantthinker",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/firefox-webext-browser": "latest",
+    "archiver": "^5.3.1",
+    "copy-webpack-plugin": "^11.0.0",
+    "file-loader": "^6.2.0",
+    "webpack": "latest",
+    "webpack-cli": "latest"
+  }
+}
