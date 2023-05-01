@@ -10,7 +10,7 @@
 
 ## first
 ```shell
-yarn install
+npm install
 ```
 
 ## second
@@ -33,5 +33,10 @@ node tmp.js
 ```shell
 cd dist && 
 web-ext lint
+```
 
+```shell
+git add . && 
+git commit -m '0.0.1.2' && 
+git push
 ```

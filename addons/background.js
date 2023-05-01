@@ -1,43 +1,36 @@
-import {act12Fn, menuIdabcFn, sendMessageWithTabNew} from './_common.js';
-
-console.log('background.js working', new Date());
-
-browser.browserAction.onClicked.addListener(
-  async (tab, info) => {
-
-    await sendMessageWithTabNew({
-      url: 'https://www.bing.com/',
-    }, {data: 'hello'});
-
-  });
-
-browser.pageAction.onClicked.addListener(
-  async (tab, info) => {
-
-  });
+import {
+  menuIdabcFn,
+  watchTabonBeforeNavigateFn,
+} from './_common.js';
 
 browser.runtime.onMessage.addListener(async (message) => {
-  console.log(`meslog browser.runtime.onMessage message=\n`, message);
+//  console.log(`meslog browser.runtime.onMessage message=\n`, message);
   let action = message.action;
   switch (action) {
-    case 'act12':
-      await act12Fn(message);
+    // *********** upload_form.js
+    case 'watchTabonBeforeNavigate':
+      await watchTabonBeforeNavigateFn(message);
       break;
+
   }
 });
 
 let menuIdabc = browser.contextMenus.create({
-  id: 'menuIdabc', title: 'menuIdabc title',
-  contexts: ['link', 'video', 'page', 'selection'],
+  id: 'menuIdabc', title: 'save file to up-load.io',
+  contexts: [
+    'link', 'image'
+  ],
 }, null);
 
 browser.contextMenus.onClicked.addListener(
   async (info, tab) => {
+    console.log(`meslog info=\n`, info);
+    
     switch (info.menuItemId) {
       case menuIdabc:
-        await menuIdabcFn({info, tab});
+        let downlink = info.linkUrl || info.srcUrl
+        await menuIdabcFn({downlink});
         break;
-
     }
 
   });

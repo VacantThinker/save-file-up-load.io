@@ -63,8 +63,8 @@ async function _tabSendMessage(tabCreateId, message) {
 
 /**
  * send message to tab by tabId
- * @param createProp{_CreateCreateProperties}
- * @param message{Object}
+ * @param createProp{Object: _CreateCreateProperties}
+ * @param message{{downlink}}
  */
 async function sendMessageWithTabNew(createProp, message) {
   let tabCreate = await brTabCreate(createProp);
@@ -115,6 +115,38 @@ async function sendMessageWithTabExists(
   }
 }
 
+/**
+ *
+ * @param message{ {title:String, text:String, timeout?:number}}
+ * @returns {Promise<void>}
+ */
+async function sendMessageToNoticeFn(message) {
+  let {title, text} = message;
+  let titleDefault = 'youtube playlist download queue', textDefault = '';
+  title = title ? title : titleDefault;
+  text = text ? text : textDefault;
+
+  let notificationId = 'cake-notification';
+  let type = 'basic';
+
+  let timeout = 3;
+  try {
+    timeout = message.hasOwnProperty('timeout')
+      ? parseInt(String(message.timeout))
+      : timeout;
+  } catch (e) {
+    timeout = 3;
+  }
+
+  await browser.notifications.create(notificationId, {
+    type,
+    title,
+    message: text,
+    eventTime: timeout * 1000,
+  });
+
+}
+
 // *******************************
 // browser.runtime.onMessage.addListener
 
@@ -123,11 +155,45 @@ function act12Fn(message) {
 
 }
 
+/**
+ *
+ * @param message{{tabId, title, text}}
+ */
+async function watchTabonBeforeNavigateFn(message) {
+  let {tabId, title, text} = message;
+
+  // tab url changed
+  let cb5 = (details) => {
+    if (details.tabId === tabId) {
+      sendMessageToNoticeFn({title, text});
+      browser.webNavigation.onCompleted.removeListener(cb5);
+    }
+  };
+  browser.webNavigation.onCompleted.addListener(cb5);
+
+}
+
 // *******************************
 // browser.contextMenus.onClicked.addListener
 
-function menuIdabcFn(message) {
+function getURLList() {
+  return{
+    up_loadio$upload_form: "https://up-load.io/?op=upload_form"
+  }
+}
+/**
+ *
+ * @param message{{downlink}}
+ */
+async function menuIdabcFn(message) {
   // todo do something
+  let url = getURLList().up_loadio$upload_form
+
+  let {downlink} = message
+  await sendMessageWithTabNew(
+    {url, active: false},
+    {downlink})
+
 }
 
 export {
@@ -144,6 +210,7 @@ export {
   // *******************************
   // browser.runtime.onMessage.addListener
   act12Fn,
+  watchTabonBeforeNavigateFn,
 
   // *******************************
   // browser.contextMenus.onClicked.addListener
